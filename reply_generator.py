@@ -34,7 +34,7 @@ def retrieve_relevant_attachment_content(query, email_has_attachments):
 
     return retrieved_text
 
-def generate_ai_reply(email_snippet, email_has_attachments):
+def generate_ai_reply(email_snippet, email_has_attachments,user_input):
     """Generate an AI-powered reply using RAG on attachments only if attachments exist."""
     relevant_attachment_content = retrieve_relevant_attachment_content(email_snippet, email_has_attachments)
 
@@ -47,6 +47,9 @@ def generate_ai_reply(email_snippet, email_has_attachments):
 
     if relevant_attachment_content and relevant_attachment_content.strip() != "No attachment content found.":
         prompt += f"\n\nThe sender also included the following attachment content:\n{relevant_attachment_content}"
+
+    if user_input.strip():  # ✅ Include user input if provided
+        prompt += f"\n\nAdditionally, the user has requested the following perspective be considered:\n{user_input}"
 
     print("📜 Final Prompt Sent to AI:\n", prompt[:1000])  # Print first 1000 chars of prompt for debugging
 

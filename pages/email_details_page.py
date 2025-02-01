@@ -101,7 +101,7 @@ def email_details_page():
 
     st.markdown(f"**📨 From:** {email['name']}")
     st.markdown(f"**📌 Subject:** {email['subject']}")
-    st.text_area("📜 Full Email Content", email["body"], height=300, disabled=True)
+    st.text_area("📜 Full Email Content", email.get("body", "No content available"), height=300, disabled=True)
 
     # ✅ Extract and store attachments automatically when the email is opened
     if "attachments" not in email:
@@ -125,15 +125,19 @@ def email_details_page():
                     mime="application/octet-stream"
                 )
 
-    # ✅ Generate AI response only if not already generated
-    if "generated_reply" not in st.session_state or st.session_state.generated_reply is None:
-        with st.spinner("🤖 Generating AI reply..."):
-            ai_reply = generate_ai_reply(email["body"], email["has attachments"])  # ✅ Pass attachment flag
+    # ✅ NEW: Optional User Input for AI Reply
+    user_input = st.text_area("✏️ Optional: Add your thoughts or guidance for the AI reply", "")
+
+    # ✅ Button to generate AI reply
+    if st.button("🤖 Generate AI Reply"):
+        with st.spinner("Generating AI reply..."):
+            ai_reply = generate_ai_reply(email["snippet"], email["has attachments"], user_input)  # ✅ Pass user input
             st.session_state.generated_reply = ai_reply
 
-    # ✅ Display AI-generated reply
-    st.markdown("### 🤖 AI-Suggested Reply")
-    st.text_area("📨 AI-Generated Reply", st.session_state.generated_reply, height=200, disabled=False)
+    # ✅ Display AI-generated reply only if available
+    if "generated_reply" in st.session_state and st.session_state.generated_reply:
+        st.markdown("### 🤖 AI-Suggested Reply")
+        st.text_area("📨 AI-Generated Reply", st.session_state.generated_reply, height=200, disabled=False)
 
     # ✅ Back button to return to the inbox
     if st.button("⬅️ Back to Inbox"):
