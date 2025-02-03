@@ -80,7 +80,6 @@ def store_attachment_in_vector_db(attachments):
         print("⚠️ No valid attachment text found. Skipping FAISS storage.")
         return  # ✅ Exit early if no valid texts
 
-    # ✅ Initialize FAISS only if we have valid data
     if os.path.exists("attachments_index"):
         vector_db = FAISS.load_local("attachments_index", embeddings, allow_dangerous_deserialization=True)
     else:
@@ -103,21 +102,18 @@ def email_details_page():
     st.markdown(f"**📌 Subject:** {email['subject']}")
     st.text_area("📜 Full Email Content", email.get("body", "No content available"), height=300, disabled=True)
 
-    # ✅ Extract and store attachments automatically when the email is opened
     if "attachments" not in email:
         with st.spinner("🔄 Loading attachments..."):
             email["attachments"] = extract_attachments(email["id"])
-            store_attachment_in_vector_db(email["attachments"])  # ✅ Store in FAISS
-            st.session_state.selected_email = email  # Save to session state
+            store_attachment_in_vector_db(email["attachments"])  
+            st.session_state.selected_email = email  
 
-    # ✅ Provide an option to view attachments, but don't show by default
     if email.get("attachments"):
         st.markdown("### 📎 Attachments")
         for attachment in email["attachments"]:
             with st.expander(f"📄 {attachment['filename']} (Click to view)"):
                 st.text_area("Attachment Content", attachment["text"], height=400, disabled=True)
 
-                # Provide a download option
                 st.download_button(
                     label=f"📥 Download {attachment['filename']}",
                     data=attachment["raw_data"],
@@ -125,7 +121,6 @@ def email_details_page():
                     mime="application/octet-stream"
                 )
     user_input = ""
-    # Optional User Input for AI Reply
     user_input = st.text_area("✏️ Optional: Add your thoughts or guidance for the AI reply", "")
 
     writing_style_pdf = st.file_uploader("📄 Upload a PDF with writing samples (optional)", type=["pdf"])

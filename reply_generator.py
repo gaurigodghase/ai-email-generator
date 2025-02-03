@@ -57,8 +57,6 @@ def generate_digital_twin(style_text):
 
 def retrieve_relevant_attachment_content(query, email_has_attachments):
     """Retrieves relevant content from stored attachments using FAISS, only if the email has attachments."""
-    
-    # Skip FAISS retrieval if the current email has no attachments
     if not email_has_attachments:
         return "No attachment content found."
 
@@ -131,7 +129,6 @@ def generate_ai_reply(email_snippet, email_has_attachments, user_input, style_sa
         extracted_style = "No writing style provided."
 
     response = generate_draft_email(email_snippet, email_has_attachments, user_input, extracted_style)
-    #print(response)
     print("\n✅ AI-Generated Styled Response:")
     print(response)
 
