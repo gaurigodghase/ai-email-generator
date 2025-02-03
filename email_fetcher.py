@@ -2,7 +2,7 @@ from gmail_auth import authenticate_gmail
 import base64
 
 def fetch_recent_emails(max_results=20):
-    """Fetch recent emails from the Gmail Primary category with snippet and full body."""
+    """Fetch recent emails from the Gmail Primary category."""
     service = authenticate_gmail()
     query = "category:primary"  # Fetch only Primary emails
     results = service.users().messages().list(userId="me", q=query, maxResults=max_results).execute()
@@ -15,7 +15,6 @@ def fetch_recent_emails(max_results=20):
         body = get_email_body(email_data["payload"])
         has_attachments = any(part.get("filename") for part in email_data["payload"].get("parts", []))
         
-
         email_data_list.append({
             "id": msg["id"],
             "name": headers.get("From", "Unknown"),

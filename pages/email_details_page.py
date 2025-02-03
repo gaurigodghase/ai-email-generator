@@ -124,22 +124,28 @@ def email_details_page():
                     file_name=attachment["filename"],
                     mime="application/octet-stream"
                 )
-
-    # ✅ NEW: Optional User Input for AI Reply
+    user_input = ""
+    # Optional User Input for AI Reply
     user_input = st.text_area("✏️ Optional: Add your thoughts or guidance for the AI reply", "")
 
-    # ✅ Button to generate AI reply
+    writing_style_pdf = st.file_uploader("📄 Upload a PDF with writing samples (optional)", type=["pdf"])
+    writing_style_text = ""
+    if writing_style_pdf:
+        pdf_bytes = writing_style_pdf.read() 
+        writing_style_text = extract_text_from_pdf(pdf_bytes)
+
+    #Button to generate AI reply
     if st.button("🤖 Generate AI Reply"):
         with st.spinner("Generating AI reply..."):
-            ai_reply = generate_ai_reply(email["snippet"], email["has attachments"], user_input)  # ✅ Pass user input
+            ai_reply = generate_ai_reply(email["snippet"], email["has attachments"], user_input, writing_style_text)  # ✅ Pass user input
             st.session_state.generated_reply = ai_reply
 
-    # ✅ Display AI-generated reply only if available
+    #Display AI-generated reply only if available
     if "generated_reply" in st.session_state and st.session_state.generated_reply:
         st.markdown("### 🤖 AI-Suggested Reply")
         st.text_area("📨 AI-Generated Reply", st.session_state.generated_reply, height=200, disabled=False)
 
-    # ✅ Back button to return to the inbox
+    #Back button to return to the inbox
     if st.button("⬅️ Back to Inbox"):
         st.session_state.selected_email = None
         st.session_state.generated_reply = None
